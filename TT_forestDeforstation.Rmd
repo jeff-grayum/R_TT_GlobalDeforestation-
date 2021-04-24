@@ -1,0 +1,42 @@
+---
+title: "TT_GlobalDeforestation"
+author: "Jeff Grayum"
+date: "4/24/2021"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Loading libraries           
+```{r}
+library(tidyverse)
+library(tidytuesdayR)
+library(ggthemes)
+library(scales)
+```
+
+Loading dataset
+```{r}
+tuesdata <- tidytuesdayR::tt_load('2021-04-06')
+```
+
+
+A lot of datasets!  Let's take a quick look at each.
+```{r}
+forest <- tuesdata$forest %>%
+  view()
+
+forest %>%
+  group_by(entity) %>%
+  summarize(mean_nfc = mean(net_forest_conversion)) %>%
+  ungroup() %>%
+  mutate(entity = fct_reorder(entity, mean_nfc)) %>% #WHY ISN'T THIS SORTING??!!
+  view()
+  
+  
+```
+
