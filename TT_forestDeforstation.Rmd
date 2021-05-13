@@ -22,6 +22,8 @@ library(scales)
 Loading dataset
 ```{r}
 tuesdata <- tidytuesdayR::tt_load('2021-04-06')
+
+#Source: Our Wolrd in Data
 ```
 
 
@@ -31,12 +33,83 @@ forest <- tuesdata$forest %>%
   view()
 
 forest %>%
+  count(entity, sort = TRUE) %>%
+  view()
+
+forest %>% 
+  count(year)
+
+forest_area <- tuesdata$forest_area
+
+forest_area %>%
+  count(year, sort = TRUE)
+
+forest %>%
   group_by(entity) %>%
   summarize(mean_nfc = mean(net_forest_conversion)) %>%
   ungroup() %>%
-  mutate(entity = fct_reorder(entity, mean_nfc)) %>% #WHY ISN'T THIS SORTING??!!
+  mutate(entity = fct_reorder(entity, mean_nfc)) %>% #WHYYY ARENT YOU SORTING FRIEND?!
   view()
+
+forest_area %>%
+  filter(entity == "United States") %>%
+  ggplot(aes(year, forest_area)) +
+  geom_line() +
+  expand_limits(y = 0) +
+  theme_fivethirtyeight() +
+  labs(x = "Year",
+       y = "Forest area",
+       title = "Change in forest area over time in the United States",
+       caption = "Source: Our World in Data") +
+  theme(axis.title = element_text(),
+        text = element_text(family = "Times New Roman"))
+
+forest_area %>%
+  group_by(year) %>%
+  summarize(sum(forest_area)) %>%
+  view()
+
+forest_area %>%
+  filter(year == max(year)) %>%
+  arrange(desc(forest_area)) %>%
+  view()
+
+forest_area_country <- forest_area %>%
+  filter(str_length(code) == 3) %>%
+  filter(year >= 1992) %>%
+  rename(country = entity) %>%
+  mutate(forest_area = forest_area / 100) 
+
+forest_area_country %>%
+  filter(year == max(year)) %>%
+  arrange(desc(forest_area)) %>%
+  view()
+
+forest_area_country %>%
+  group_by(year) %>%
+  summarize(sum(forest_area)) %>%
+  view()
+
+forest_area_country %>%
+  filter(country %in% c("United States", "Canada", "China", "India", "Senegal", "Germany", "Brazil", "Poland")) %>%
+  mutate(country = fct_reorder(country, -forest_area)) %>%
+  ggplot(aes(year, forest_area, color = country)) +
+  geom_line() +
+  expand_limits(y = 0) +
+  labs(title = "Changes in forest area in four major countries",
+       x = "Year",
+       y = "% of global forest area",
+       color = "") +
+  theme_fivethirtyeight() +
+  scale_y_continuous(labels = percent) +
+  theme(axis.title = element_text(),
+        text = element_text(family = "Times New Roman"))
+
   
+
+
+
+
   
 ```
 
